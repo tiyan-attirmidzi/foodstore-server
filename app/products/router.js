@@ -3,6 +3,7 @@ const router = require('express').Router()
 const os = require('os')
 const productController = require('./controller')
 
+router.get('/products', productController.index)
 router.post('/product', multer({dest: os.tmpdir()}).single('image'), productController.store)
 
 module.exports = router

@@ -3,6 +3,19 @@ const path = require('path')
 const config = require('../config')
 const Product = require('./model')
 
+async function index (req, res, next) {
+    try {
+        const products = await Product.find()
+        return res.status(200).json({
+            status: 200,
+            message: "Products Data",
+            data: products
+        })
+    } catch (error) {
+        next(error)
+    }
+}
+
 async function store(req, res, next) {
     try {
 
