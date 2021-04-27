@@ -5,7 +5,8 @@ const Product = require('./model')
 
 async function index (req, res, next) {
     try {
-        const products = await Product.find()
+        let { limit = 10, skip = 0 } = req.query
+        let products = await Product.find().limit(parseInt(limit)).skip(parseInt(skip))
         return res.status(200).json({
             status: 200,
             message: "Products Data",
