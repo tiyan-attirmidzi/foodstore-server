@@ -145,8 +145,23 @@ async function update(req, res, next) {
     }
 }
 
+async function destroy(req, res, next) {
+    try {
+        let product = await Product.findOneAndDelete({ _id: req.params.id })
+        let currentImage = `${config.rootPath}/public/uploads/${product.image_url}`
+        // Destroy Image When Updated
+        if (fs.existsSync(currentImage)) {
+            fs.unlinkSync(currentImage)
+        }
+        return res.status(200).json(product)
+    } catch (error) {
+        next(error)
+    }
+}
+
 module.exports = {
     index,
     store,
-    update
+    update,
+    destroy
 }
