@@ -39,7 +39,17 @@ async function update(req, res, next) {
     }
 }
 
+async function destroy(req, res, next) {
+    try {
+        let tag = await Tag.findOneAndDelete({ _id: req.params.id })
+        return res.json(tag)
+    } catch (error) {
+        next(error)
+    }
+}
+
 module.exports = {
     store,
-    update
+    update, 
+    destroy
 }
