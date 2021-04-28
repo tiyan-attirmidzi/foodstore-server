@@ -39,7 +39,17 @@ async function update(req, res, next) {
     }
 }
 
+async function destroy(req, res, next) {
+    try {
+        let category = await Category.findOneAndDelete({ _id: req.params.id })
+        return res.json(category)
+    } catch (error) {
+        next(error)
+    }
+}
+
 module.exports = {
     store,
-    update
+    update,
+    destroy
 }
