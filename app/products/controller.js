@@ -10,7 +10,7 @@ async function index (req, res, next) {
         let { limit = 10, skip = 0, q = '', category = '', tags = [] } = req.query
         let criteria = {};
 
-        if (q.query) {
+        if (q.length) {
             criteria = {
                 ...criteria,
                 name: { $regex: `${q}`, $options: 'i' }
