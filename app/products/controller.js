@@ -2,11 +2,12 @@ const fs = require('fs')
 const path = require('path')
 const config = require('../config')
 const Product = require('./model')
+const Category = require('../categories/model')
 
 async function index (req, res, next) {
     try {
         let { limit = 10, skip = 0 } = req.query
-        let products = await Product.find().limit(parseInt(limit)).skip(parseInt(skip))
+        let products = await Product.find().limit(parseInt(limit)).skip(parseInt(skip)).populate('category')
         return res.status(200).json({
             status: 200,
             message: "Products Data",
@@ -21,6 +22,17 @@ async function store(req, res, next) {
     try {
 
         let payload = req.body
+
+        if (payload.category) {
+            let category = await Category.findOne({
+                name: { $regex: payload.category, $options: 'i' }
+            })
+            if (category) {
+                payload = { ...payload, category: category._id }
+            } else {
+                delete payload.category
+            }
+        }
 
         if (req.file) {
             let tempPath = req.file.path
