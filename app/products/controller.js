@@ -3,11 +3,16 @@ const path = require('path')
 const config = require('../config')
 const Product = require('./model')
 const Category = require('../categories/model')
+const Tag = require('../tags/model')
 
 async function index (req, res, next) {
     try {
         let { limit = 10, skip = 0 } = req.query
-        let products = await Product.find().limit(parseInt(limit)).skip(parseInt(skip)).populate('category')
+        let products = await Product.find()
+            .limit(parseInt(limit))
+            .skip(parseInt(skip))
+            .populate('category')
+            .populate('tags')
         return res.status(200).json({
             status: 200,
             message: "Products Data",
@@ -31,6 +36,13 @@ async function store(req, res, next) {
                 payload = { ...payload, category: category._id }
             } else {
                 delete payload.category
+            }
+        }
+
+        if (payload.tags && payload.tags.length) {
+            let tags = await Tag.find({ name: {$in: payload.tags} })
+            if (tags.length) {
+                payload = { ...payload, tags: tags.map(tag => tag._id) }
             }
         }
 
@@ -92,6 +104,24 @@ async function update(req, res, next) {
     try {
 
         let payload = req.body
+
+        if (payload.category) {
+            let category = await Category.findOne({
+                name: { $regex: payload.category, $options: 'i' }
+            })
+            if (category) {
+                payload = { ...payload, category: category._id }
+            } else { 
+                delete payload.category
+            }
+        }
+
+        if (payload.tags && payload.tags.length) {
+            let tags = await Tag.find({ name: {$in: payload.tags} })
+            if (tags.length) {
+                payload = { ...payload, tags: tags.map(tag => tag._id )}
+            }
+        }
 
         if (req.file) {
             let tempPath = req.file.path
